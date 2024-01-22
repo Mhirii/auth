@@ -18,14 +18,16 @@ export const signup = async (c: Context) => {
     const user = await xata.db.auths.create({
       username: username,
       email: email,
-      password_hash: passwordHash, // TODO: hash the password
+      password_hash: passwordHash,
     });
 
+    // TODO:This should be handled in encodeJWT
     const hour = 3600000;
     const year = hour * 24 * 31 * 12;
     const expiry = Date.now() + hour;
     const refreshExpiry = (Date.now() + year).toString();
 
+    // TODO: Split this into two functions
     const { access_token, refresh_token } = await encodeJWT(c, {
       username: username,
       email: email,
@@ -34,7 +36,6 @@ export const signup = async (c: Context) => {
       refresh_expiry: refreshExpiry,
     });
 
-    console.log("creating session");
     const session = await xata.db.sessions.create({
       auth: user.id,
       refresh_token,

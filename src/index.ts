@@ -5,7 +5,6 @@ import { signup, SignupSchema } from "./signup";
 import { login, LoginSchema } from "./login";
 import refresh from "./refresh";
 import logout from "./logout";
-import { compare, hash } from "./utils";
 
 type Bindings = {
   XATA_BRANCH: string;
@@ -28,21 +27,26 @@ app.post(
   zValidator("json", LoginSchema),
   async (c) => await login(c),
 );
-app.post("/hash", async (c) => {
-  const body = await c.req.json();
-  const password = body.password as string;
-  const passwordHash = await hash(password);
-  return c.json(passwordHash);
-});
-
-app.post("/compare", async (c) => {
-  const body = await c.req.json();
-  const passwordHash = body.passwordHash as string;
-  const password = body.password as string;
-  const result = await compare(password, passwordHash);
-  return c.json(result);
-});
 app.route("/logout", logout);
 app.route("/refresh", refresh);
+
+// ╭─────────────────────────────────────────────────────────╮
+// │                                                         │
+// │ import { compare, hash } from "./utils";                │
+// │ app.post("/hash", async (c) => {                        │
+// │ const body = await c.req.json();                        │
+// │ const password = body.password as string;               │
+// │ const passwordHash = await hash(password);              │
+// │ return c.json(passwordHash);                            │
+// │ });                                                     │
+// │ app.post("/compare", async (c) => {                     │
+// │ const body = await c.req.json();                        │
+// │ const passwordHash = body.passwordHash as string;       │
+// │ const password = body.password as string;               │
+// │ const result = await compare(password, passwordHash);   │
+// │ return c.json(result);                                  │
+// │ });                                                     │
+// │                                                         │
+// ╰─────────────────────────────────────────────────────────╯
 
 export default app;
