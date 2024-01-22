@@ -1,9 +1,18 @@
 import { Hono } from "hono";
+import { zValidator } from "@hono/zod-validator";
+import { z } from "zod";
 
-const signup = new Hono();
+const schema = z.object({
+  username: z.string().min(4).max(20),
+  email: z.string().email(),
+  password: z.string().min(8),
+});
 
-signup.get("/", (c) => c.json("list books"));
-signup.post("/", (c) => c.json("create a book", 201));
-signup.get("/:id", (c) => c.json(`get ${c.req.param("id")}`));
+const app = new Hono();
 
-export default signup;
+app.post("/", zValidator("json", schema), async (c) => {
+  const body = await c.req.json();
+  return c.json(body);
+});
+
+export default app;

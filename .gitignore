@@ -7,3 +7,10 @@ dist
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
+
+
+.xatarc
+.xata
+.env
+wrangler.toml
+src/xata.ts
