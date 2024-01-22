@@ -1,7 +1,7 @@
 import { Context } from "hono";
 import { z } from "zod";
 
-import { encodeJWT, getXata, hashPassword } from "./utils";
+import { encodeJWT, getXata } from "./utils";
 
 export const SignupSchema = z.object({
   username: z.string().min(4).max(20),
@@ -12,13 +12,13 @@ export const SignupSchema = z.object({
 export const signup = async (c: Context) => {
   const { username, email, password } = await c.req.json();
 
+  const xata = getXata(c);
   try {
-    const xata = getXata(c);
-    const password_hash = await hashPassword(password);
+    console.log("creating user");
     const user = await xata.db.auths.create({
       username: username,
       email: email,
-      password_hash: password_hash,
+      password_hash: password, // TODO: hash the password
     });
 
     const hour = 3600000;
