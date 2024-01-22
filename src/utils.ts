@@ -1,7 +1,9 @@
 import { Context } from "hono";
 import { XataClient } from "./xata";
 import { sign } from "hono/jwt";
+import { AccessTokenPayload, RefreshTokenPayload } from "./types/types";
 
+// TODO: Give seperate variables instead of the whole context
 export const getXata = (c: Context) => {
   const xata = new XataClient({
     apiKey: c.env.XATA_API_KEY,
@@ -10,26 +12,31 @@ export const getXata = (c: Context) => {
   return xata;
 };
 
-type Payload = {
-  username: string;
-  email: string;
-  id: string;
-  expiry: string;
-  refresh_expiry: string;
-};
-export const encodeJWT = async (c: Context, payload: Payload) => {
-  const secret = c.env.JWT_SECRET;
-  const access_payload = {
-    id: payload.id,
-    username: payload.username,
-    email: payload.email,
-    expiry: payload.expiry,
-  };
-  const access_token = await sign(access_payload, secret);
-  const refresh_payload = { id: payload.id, expiry: payload.refresh_expiry };
+export const hour = 3600000;
+export const year = hour * 24 * 31 * 12;
+export const accessTokenExpiry = Date.now() + hour;
+export const refreshTokenExpiry = Date.now() + year;
 
-  const refresh_token = await sign(refresh_payload, secret);
-  return { access_token, refresh_token };
+export const createAccessToken = async (
+  secret: string,
+  accessTokenPayload: AccessTokenPayload,
+) => {
+  const accessToken = await sign(
+    { ...accessTokenPayload, expiry: accessTokenExpiry },
+    secret,
+  );
+  return { accessToken, accessTokenExpiry };
+};
+
+export const createRefreshToken = async (
+  secret: string,
+  refreshTokenPayload: RefreshTokenPayload,
+) => {
+  const refreshToken = await sign(
+    { ...refreshTokenPayload, expiry: refreshTokenExpiry },
+    secret,
+  );
+  return { refreshToken, refreshTokenExpiry };
 };
 
 export const hash = async (password: string) => {
@@ -50,8 +57,6 @@ export const compare = async (password: string, hashedPassword: string) => {
     const hash = Array.from(new Uint8Array(hashBuffer))
       .map((b) => b.toString(16).padStart(2, "0"))
       .join("");
-    console.log(hash);
-    console.log(hashedPassword);
 
     if (hash === hashedPassword) {
       return true;

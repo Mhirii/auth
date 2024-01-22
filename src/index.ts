@@ -1,10 +1,11 @@
-import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
+import { Hono } from "hono";
 
-import { signup, SignupSchema } from "./signup";
-import { login, LoginSchema } from "./login";
-import refresh from "./refresh";
+import { LoginSchema, SignupSchema } from "./types/types";
+import { login } from "./login";
+import { signup } from "./signup";
 import logout from "./logout";
+import refresh from "./refresh";
 
 type Bindings = {
   XATA_BRANCH: string;

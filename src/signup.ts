@@ -1,46 +1,38 @@
 import { Context } from "hono";
-import { z } from "zod";
 
-import { encodeJWT, getXata, hash } from "./utils";
-
-export const SignupSchema = z.object({
-  username: z.string().min(4).max(20),
-  email: z.string().email(),
-  password: z.string().min(8),
-});
+import { createAccessToken, createRefreshToken, getXata, hash } from "./utils";
 
 export const signup = async (c: Context) => {
   const { username, email, password } = await c.req.json();
 
-  const xata = getXata(c);
   try {
+    const xata = getXata(c);
     const passwordHash = await hash(password);
+    const secret = await c.env.JWT_SECRET;
+
     const user = await xata.db.auths.create({
       username: username,
       email: email,
       password_hash: passwordHash,
     });
 
-    // TODO:This should be handled in encodeJWT
-    const hour = 3600000;
-    const year = hour * 24 * 31 * 12;
-    const expiry = Date.now() + hour;
-    const refreshExpiry = (Date.now() + year).toString();
-
-    // TODO: Split this into two functions
-    const { access_token, refresh_token } = await encodeJWT(c, {
-      username: username,
-      email: email,
+    const { accessToken, accessTokenExpiry } = await createAccessToken(secret, {
+      username,
+      email,
       id: user.id,
-      expiry: expiry.toString(),
-      refresh_expiry: refreshExpiry,
     });
+    const { refreshToken } = await createRefreshToken(secret, {
+      id: user.id,
+    });
+
+    // DB takes date in Date format
+    const access_token_expires = new Date(accessTokenExpiry);
 
     const session = await xata.db.sessions.create({
       auth: user.id,
-      refresh_token,
-      access_token,
-      access_token_expires: new Date(expiry),
+      refresh_token: refreshToken,
+      access_token: accessToken,
+      access_token_expires,
       platform: "",
     });
 
@@ -51,9 +43,9 @@ export const signup = async (c: Context) => {
       verified: user.verified,
       session: {
         id: session.id,
-        access_token,
-        refresh_token,
-        access_token_expiry: expiry,
+        access_token: accessToken,
+        refresh_token: refreshToken,
+        access_token_expiry: accessTokenExpiry.toString(),
       },
     };
 
