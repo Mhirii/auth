@@ -24,7 +24,6 @@ const tables = [
   {
     name: "sessions",
     columns: [
-      { name: "auth", type: "link", link: { table: "auths" } },
       { name: "access_token", type: "string", unique: true },
       { name: "refresh_token", type: "string", unique: true },
       { name: "platform", type: "string" },
@@ -35,6 +34,7 @@ const tables = [
         defaultValue: "now",
       },
       { name: "access_token_expires", type: "datetime" },
+      { name: "auth", type: "link", link: { table: "auths" } },
     ],
   },
 ] as const;
