@@ -31,3 +31,34 @@ export const encodeJWT = async (c: Context, payload: Payload) => {
   const refresh_token = await sign(refresh_payload, secret);
   return { access_token, refresh_token };
 };
+
+export const hash = async (password: string) => {
+  const encoder = new TextEncoder();
+  const passwordBuffer = encoder.encode(password);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", passwordBuffer);
+  const hashedPassword = Array.from(new Uint8Array(hashBuffer))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+  return hashedPassword;
+};
+
+export const compare = async (password: string, hashedPassword: string) => {
+  try {
+    const encoder = new TextEncoder();
+    const passwordBuffer = encoder.encode(password);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", passwordBuffer);
+    const hash = Array.from(new Uint8Array(hashBuffer))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+    console.log(hash);
+    console.log(hashedPassword);
+
+    if (hash === hashedPassword) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+};
