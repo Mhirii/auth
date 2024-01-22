@@ -13,4 +13,3 @@ pnpm-lock.yaml
 .xata
 .env
 wrangler.toml
-src/xata.ts

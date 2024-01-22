@@ -1,11 +1,12 @@
-import { Hono } from "hono";
+import { Context } from "hono";
+import { z } from "zod";
 
-const app = new Hono();
-
-app.post("/", async (c) => {
-  const body = await c.req.json();
-
-  return c.json(body);
+export const LoginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
 });
 
-export default app;
+export const login = async (c: Context) => {
+  const body = await c.req.json();
+  return c.json(body);
+};
