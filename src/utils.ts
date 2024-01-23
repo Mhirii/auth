@@ -13,7 +13,7 @@ export const getXata = (apiKey: string, branch: string) => {
 
 export const hour = 3600000;
 export const year = hour * 24 * 31 * 12;
-export const accessTokenExpiry = Date.now() - hour * 24;
+export const accessTokenExpiry = Date.now() + hour;
 export const refreshTokenExpiry = Date.now() + year;
 
 export const createAccessToken = async (
