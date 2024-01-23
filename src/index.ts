@@ -4,8 +4,8 @@ import { Hono } from "hono";
 import { LoginSchema, SignupSchema } from "./types/types";
 import { login } from "./login";
 import { signup } from "./signup";
-import refresh from "./refresh";
 import { logout } from "./logout";
+import { refresh } from "./refresh";
 
 type Bindings = {
   XATA_BRANCH: string;
@@ -28,9 +28,9 @@ app.post(
   zValidator("json", LoginSchema),
   async (c) => await login(c),
 );
-app.route("/logout", logout);
-app.route("/refresh", refresh);
 app.post("/logout", logout);
+// TODO: Validation
+app.post("/refresh", refresh);
 
 // ╭─────────────────────────────────────────────────────────╮
 // │                                                         │
