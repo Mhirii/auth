@@ -4,8 +4,8 @@ import { Hono } from "hono";
 import { LoginSchema, SignupSchema } from "./types/types";
 import { login } from "./login";
 import { signup } from "./signup";
-import logout from "./logout";
 import refresh from "./refresh";
+import { logout } from "./logout";
 
 type Bindings = {
   XATA_BRANCH: string;
@@ -30,6 +30,7 @@ app.post(
 );
 app.route("/logout", logout);
 app.route("/refresh", refresh);
+app.post("/logout", logout);
 
 // ╭─────────────────────────────────────────────────────────╮
 // │                                                         │
