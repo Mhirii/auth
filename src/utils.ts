@@ -3,18 +3,17 @@ import { XataClient } from "./xata";
 import { sign } from "hono/jwt";
 import { AccessTokenPayload, RefreshTokenPayload } from "./types/types";
 
-// TODO: Give seperate variables instead of the whole context
-export const getXata = (c: Context) => {
+export const getXata = (apiKey: string, branch: string) => {
   const xata = new XataClient({
-    apiKey: c.env.XATA_API_KEY,
-    branch: c.env.XATA_BRANCH,
+    apiKey: apiKey,
+    branch: branch,
   });
   return xata;
 };
 
 export const hour = 3600000;
 export const year = hour * 24 * 31 * 12;
-export const accessTokenExpiry = Date.now() + hour;
+export const accessTokenExpiry = Date.now() - hour * 24;
 export const refreshTokenExpiry = Date.now() + year;
 
 export const createAccessToken = async (
@@ -22,7 +21,7 @@ export const createAccessToken = async (
   accessTokenPayload: AccessTokenPayload,
 ) => {
   const accessToken = await sign(
-    { ...accessTokenPayload, expiry: accessTokenExpiry },
+    { ...accessTokenPayload, exp: accessTokenExpiry },
     secret,
   );
   return { accessToken, accessTokenExpiry };
@@ -33,7 +32,7 @@ export const createRefreshToken = async (
   refreshTokenPayload: RefreshTokenPayload,
 ) => {
   const refreshToken = await sign(
-    { ...refreshTokenPayload, expiry: refreshTokenExpiry },
+    { ...refreshTokenPayload, exp: refreshTokenExpiry },
     secret,
   );
   return { refreshToken, refreshTokenExpiry };

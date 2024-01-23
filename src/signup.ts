@@ -5,8 +5,11 @@ import { createAccessToken, createRefreshToken, getXata, hash } from "./utils";
 export const signup = async (c: Context) => {
   const { username, email, password } = await c.req.json();
 
+  const apiKey = await c.env.XATA_API_KEY;
+  const branch = await c.env.XATA_BRANCH;
+
   try {
-    const xata = getXata(c);
+    const xata = getXata(apiKey, branch);
     const passwordHash = await hash(password);
     const secret = await c.env.JWT_SECRET;
 
