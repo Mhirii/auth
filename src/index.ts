@@ -30,7 +30,7 @@ app.post(
 );
 app.post("/logout", logout);
 // TODO: Validation
-app.post("/refresh", refresh);
+app.get("/refresh", refresh);
 
 // ╭─────────────────────────────────────────────────────────╮
 // │                                                         │

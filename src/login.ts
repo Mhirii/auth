@@ -18,6 +18,7 @@ export const login = async (c: Context) => {
     const xata = getXata(apiKey, branch);
     const secret = await c.env.JWT_SECRET;
 
+    // get user by email
     const users = await xata.db.auths.filter({ email: email }).getMany();
     if (!users[0]) {
       return c.json({ error: "User not found" });
@@ -27,11 +28,13 @@ export const login = async (c: Context) => {
       return c.json({ error: "User not found" });
     }
 
+    // compare the pw
     const match = await compare(password, password_hash);
     if (!match) {
       return c.json({ error: "Invalid password" });
     }
 
+    // create token
     const { accessToken, accessTokenExpiry } = await createAccessToken(secret, {
       username: username,
       email: email,
