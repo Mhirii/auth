@@ -1,5 +1,4 @@
 import { Context } from "hono";
-import { verify } from "hono/jwt";
 import {
   createAccessToken,
   getTokenFromHeader,

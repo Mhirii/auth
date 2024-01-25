@@ -29,7 +29,6 @@ app.post(
   async (c) => await login(c),
 );
 app.post("/logout", logout);
-// TODO: Validation
 app.get("/refresh", refresh);
 
 // ╭─────────────────────────────────────────────────────────╮
